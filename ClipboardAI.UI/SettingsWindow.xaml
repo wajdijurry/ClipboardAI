@@ -1,0 +1,162 @@
+<Window x:Class="ClipboardAI.UI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClipboardAI.UI"
+        mc:Ignorable="d"
+        Title="ClipboardAI Settings" Height="400" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Text="Settings" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+        
+        <TabControl Grid.Row="1" x:Name="tabControl" TabStripPlacement="Top">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabControl}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TabControl}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <ScrollViewer Grid.Row="0" 
+                                                  HorizontalScrollBarVisibility="Auto" 
+                                                  VerticalScrollBarVisibility="Disabled"
+                                                  PreviewMouseWheel="TabsScrollViewer_PreviewMouseWheel">
+                                        <TabPanel IsItemsHost="True" 
+                                                  Panel.ZIndex="1" 
+                                                  KeyboardNavigation.TabIndex="1"/>
+                                    </ScrollViewer>
+                                    
+                                    <Border Grid.Row="1" 
+                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                            Background="{TemplateBinding Background}">
+                                        <ContentPresenter ContentSource="SelectedContent"/>
+                                    </Border>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                
+                <Style TargetType="{x:Type TabItem}">
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="NoWrap"/>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                
+                <Style TargetType="TabPanel">
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+                    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+                </Style>
+            </TabControl.Resources>
+            
+            <!-- Core Settings Tabs -->
+            <TabItem Header="General">
+                <StackPanel Margin="10">
+                    <CheckBox x:Name="chkStartWithWindows" Content="Start with Windows" Margin="0,5"/>
+                    <CheckBox x:Name="chkMinimizeToTray" Content="Minimize to system tray" Margin="0,5"/>
+                    
+                    <TextBlock Text="Clipboard History Settings" FontWeight="Bold" Margin="0,15,0,5"/>
+                    
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Text="History Item Expiration (days):" Margin="0,5" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblExpirationDaysValue" Text="30" Margin="5,5,0,5" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <Slider x:Name="sldExpirationDays" Minimum="1" Maximum="90" Value="30" 
+                            TickPlacement="BottomRight" TickFrequency="7" IsSnapToTickEnabled="True"
+                            Width="200" HorizontalAlignment="Left" ValueChanged="sldExpirationDays_ValueChanged"/>
+                    <TextBlock Text="Set how many days to keep clipboard history items before they expire" 
+                               FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="0,2,0,10"/>
+                </StackPanel>
+            </TabItem>
+            
+            <TabItem Header="Advanced">
+                <StackPanel Margin="10">
+                    <DockPanel>
+                        <TextBlock Text="Processing Threads:" Margin="0,5" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblThreadsValue" Text="2" Margin="5,5,0,5" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <Slider x:Name="sldThreads" Minimum="1" Maximum="8" Value="2" 
+                            TickPlacement="BottomRight" TickFrequency="1" IsSnapToTickEnabled="True"
+                            Width="200" HorizontalAlignment="Left" ValueChanged="sldThreads_ValueChanged"/>
+                    
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Text="Memory Usage Limit (MB):" Margin="0,5" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblMemoryLimitValue" Text="1024" Margin="5,5,0,5" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <Slider x:Name="sldMemoryLimit" Minimum="256" Maximum="4096" Value="1024" 
+                            TickPlacement="BottomRight" TickFrequency="256" IsSnapToTickEnabled="True"
+                            Width="200" HorizontalAlignment="Left" ValueChanged="sldMemoryLimit_ValueChanged"/>
+                    
+                    <!-- Debug logging option removed -->
+                    <CheckBox x:Name="chkUseCPUOnly" Content="Use CPU only (disable GPU acceleration)" Margin="0,5"/>
+                </StackPanel>
+            </TabItem>
+            
+            <TabItem Header="Hotkeys">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="0,0,0,10">
+                        Configure hotkeys to quickly access the clipboard context menu. Press the key combination you want to use.
+                    </TextBlock>
+                    
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Show Menu:" Margin="0,5,10,5" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtHotkey" Margin="0,5" KeyDown="txtHotkey_KeyDown"/>
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Favorites Menu:" Margin="0,5,10,5" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtCopyHotkey" Margin="0,5" KeyDown="txtHotkey_KeyDown"/>
+                        
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Paste Result:" Margin="0,5,10,5" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtPasteHotkey" Margin="0,5" KeyDown="txtHotkey_KeyDown"/>
+                    </Grid>
+                    
+                    <Button Grid.Row="3" Content="Reset to Defaults" x:Name="btnResetHotkeys" HorizontalAlignment="Left" Margin="0,10,0,0" Click="btnResetHotkeys_Click"/>
+                </Grid>
+            </TabItem>
+            
+            <!-- Plugin tabs will be added here dynamically -->
+        </TabControl>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button x:Name="btnCancel" Content="Cancel" Width="80" Margin="5,0,0,0" Click="btnCancel_Click"/>
+            <Button x:Name="btnSave" Content="Save" Width="80" Margin="5,0,0,0" Click="btnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

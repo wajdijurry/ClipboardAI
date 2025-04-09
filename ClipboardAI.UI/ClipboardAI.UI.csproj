@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <ApplicationIcon>Resources\app_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClipboardAI.Common\ClipboardAI.Common.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugins\ClipboardAI.Plugins.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.OCR\ClipboardAI.Plugin.OCR.csproj" />
+
+
+    <ProjectReference Include="..\ClipboardAI.Plugin.JsonFormatter\ClipboardAI.Plugin.JsonFormatter.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.PasswordGen\ClipboardAI.Plugin.PasswordGen.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.EmailExpansion\ClipboardAI.Plugin.EmailExpansion.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.TableConversion\ClipboardAI.Plugin.TableConversion.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.KeywordExtraction\ClipboardAI.Plugin.KeywordExtraction.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.GrammarChecker\ClipboardAI.Plugin.GrammarChecker.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.SmartFormatting\ClipboardAI.Plugin.SmartFormatting.csproj" />
+    <ProjectReference Include="..\ClipboardAI.Plugin.LanguageDetection\ClipboardAI.Plugin.LanguageDetection.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Flags\*.png" />
+    <Resource Include="Resources\app_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Flags\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClipboardAI.Core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\README.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="tessdata\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Add this section to copy plugins to the output directory -->
+  <Target Name="CopyPluginsToOutput" AfterTargets="Build">
+    <ItemGroup>
+      <PluginFiles Include="..\ClipboardAI.Plugin.OCR\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.OCR.dll" />
+
+
+      <PluginFiles Include="..\ClipboardAI.Plugin.JsonFormatter\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.JsonFormatter.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.PasswordGen\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.PasswordGen.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.EmailExpansion\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.EmailExpansion.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.TableConversion\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.TableConversion.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.KeywordExtraction\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.KeywordExtraction.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.GrammarChecker\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.GrammarChecker.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.SmartFormatting\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.SmartFormatting.dll" />
+      <PluginFiles Include="..\ClipboardAI.Plugin.LanguageDetection\bin\$(Configuration)\$(TargetFramework)\ClipboardAI.Plugin.LanguageDetection.dll" />
+    </ItemGroup>
+    <Message Text="Copying plugin DLLs to $(OutDir)plugins" Importance="high" />
+    <MakeDir Directories="$(OutDir)plugins" Condition="!Exists('$(OutDir)plugins')" />
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutDir)plugins" />
+  </Target>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+  </ItemGroup>
+
+</Project>

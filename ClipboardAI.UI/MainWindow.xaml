@@ -1,0 +1,383 @@
+<Window x:Class="ClipboardAI.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClipboardAI.UI"
+        mc:Ignorable="d"
+        Title="ClipboardAI" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <!-- Converters -->
+        <local:FavoriteColorConverter x:Key="FavoriteColorConverter"/>
+        <local:ContentTypeToVisibilityConverter x:Key="ContentTypeToVisibilityConverter"/>
+        <local:HeightDividerConverter x:Key="HeightDividerConverter"/>
+        
+        <!-- Button styles -->
+        <Style x:Key="ClassicButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#F0F0F0"/>
+            <Setter Property="BorderBrush" Value="#ADADAD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="MinWidth" Value="100"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5F1FB"/>
+                    <Setter Property="BorderBrush" Value="#0078D7"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#CCE4F7"/>
+                    <Setter Property="BorderBrush" Value="#005499"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- ComboBox style -->
+        <Style x:Key="ClassicComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#F0F0F0"/>
+            <Setter Property="BorderBrush" Value="#ADADAD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="MinHeight" Value="30"/>
+        </Style>
+        
+        <!-- Icon button style -->
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        
+        <!-- Search box style -->
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="30"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <DataTemplate x:Key="ClipboardItemTemplate">
+            <Border BorderThickness="0,0,0,1" BorderBrush="#EEEEEE" Margin="0">
+                <Canvas Width="280" Height="60" ClipToBounds="True">
+                    <!-- Icon or thumbnail based on content type -->
+                    <Border Canvas.Left="5" Canvas.Top="5" Width="40" Height="40" Background="#F0F0F0" CornerRadius="4">
+                        <Grid>
+                            <!-- Text content icon -->
+                            <TextBlock Text="📝" FontFamily="Segoe UI Emoji" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Visibility="{Binding ContentType, Converter={StaticResource ContentTypeToVisibilityConverter}, ConverterParameter=Text}"/>
+                            
+                            <!-- Image content icon/thumbnail - with CacheMode for better performance -->
+                            <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="2"
+                                   Visibility="{Binding ContentType, Converter={StaticResource ContentTypeToVisibilityConverter}, ConverterParameter=Image}"
+                                   RenderOptions.BitmapScalingMode="LowQuality">
+                                <Image.CacheMode>
+                                    <BitmapCache EnableClearType="False" SnapsToDevicePixels="True" />
+                                </Image.CacheMode>
+                            </Image>
+                            
+                            <!-- File content icon -->
+                            <TextBlock Text="📁" FontFamily="Segoe UI Emoji" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Visibility="{Binding ContentType, Converter={StaticResource ContentTypeToVisibilityConverter}, ConverterParameter=File}"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Content preview -->
+                    <StackPanel Canvas.Left="55" Canvas.Top="5" Width="170" Height="50">
+                        <TextBlock Text="{Binding Preview}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="25"/>
+                        <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:g}'}" FontSize="10" Foreground="#666"/>
+                    </StackPanel>
+                    
+                    <!-- Favorite button - positioned absolutely with balanced size -->
+                    <Button Canvas.Left="230" Canvas.Top="10" 
+                           Background="Transparent"
+                           BorderThickness="0"
+                           Width="25" 
+                           Height="25"
+                           Padding="0"
+                           Click="btnToggleFavorite_Click"
+                           Tag="{Binding Id}">
+                        <Viewbox Width="18" Height="18">
+                            <Path Data="M 12,0 L 15,9 24,9 17,14 20,24 12,18 4,24 7,14 0,9 9,9 Z" 
+                                 Fill="{Binding IsFavorite, Converter={StaticResource FavoriteColorConverter}}"
+                                 Stroke="{Binding IsFavorite, Converter={StaticResource FavoriteColorConverter}}"
+                                 StrokeThickness="1"/>
+                        </Viewbox>
+                    </Button>
+                </Canvas>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Top toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <Button x:Name="btnSettings" Style="{StaticResource ClassicButtonStyle}" Click="btnSettings_Click">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="⚙️" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                    <TextBlock Text="Settings"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="btnClearAll" Style="{StaticResource ClassicButtonStyle}" Click="btnClearAll_Click" Margin="10,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🗑️" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                    <TextBlock Text="Clear All"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        
+        <!-- Main content area -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+                
+            <!-- Left panel - Clipboard history -->
+            <DockPanel Grid.Column="0" Margin="5">
+                <Grid DockPanel.Dock="Top" Margin="0,10,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0" BorderBrush="#ADADAD" BorderThickness="1" CornerRadius="3">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Search icon -->
+                            <TextBlock Grid.Column="0" Text="🔍" FontFamily="Segoe UI Emoji" FontSize="14" Margin="8,0,0,0" 
+                                     VerticalAlignment="Center" Foreground="#666"/>
+                            
+                            <!-- Search textbox -->
+                            <TextBox Grid.Column="1" x:Name="txtSearch" 
+                                     BorderThickness="0"
+                                     Padding="5,3"
+                                     Text="Search history..."
+                                     GotFocus="txtSearch_GotFocus"
+                                     LostFocus="txtSearch_LostFocus" 
+                                     TextChanged="txtSearch_TextChanged"
+                                     Style="{StaticResource SearchBoxStyle}"/>
+                        </Grid>
+                    </Border>
+                    
+                    <Button x:Name="btnClearSearch" Grid.Column="1" Content="✕" FontFamily="Segoe UI Emoji"
+                            Click="btnClearSearch_Click" 
+                            Width="30" Style="{StaticResource IconButtonStyle}"/>
+                </Grid>
+                
+                <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" PreviewMouseWheel="FilterButtons_PreviewMouseWheel">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button x:Name="btnShowAll" Style="{StaticResource ClassicButtonStyle}" Click="btnShowAll_Click" Width="80">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🗃️" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="All"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnShowFavorites" Style="{StaticResource ClassicButtonStyle}" Click="btnShowFavorites_Click" Width="100">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⭐" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Favorites"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnShowText" Style="{StaticResource ClassicButtonStyle}" Click="btnShowText_Click" Width="80">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📝" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Text"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnShowImages" Style="{StaticResource ClassicButtonStyle}" Click="btnShowImages_Click" Width="90">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🖼️" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Images"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnShowFiles" Style="{StaticResource ClassicButtonStyle}" Click="btnShowFiles_Click" Width="80">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📁" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Files"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+                
+                <ListView x:Name="lvClipboardHistory" 
+                        ItemTemplate="{StaticResource ClipboardItemTemplate}"
+                        SelectionChanged="lvClipboardHistory_SelectionChanged"
+                        MouseDoubleClick="lvClipboardHistory_MouseDoubleClick"
+                        KeyDown="lvClipboardHistory_KeyDown"
+                        PreviewMouseRightButtonDown="lvClipboardHistory_PreviewMouseRightButtonDown"
+                        BorderThickness="1"
+                        BorderBrush="#DDD"
+                        MaxHeight="500"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.CanContentScroll="True"
+                        VirtualizingPanel.IsVirtualizing="True"
+                        VirtualizingPanel.VirtualizationMode="Recycling"
+                        VirtualizingPanel.CacheLength="5,5"
+                        VirtualizingPanel.CacheLengthUnit="Item"
+                        VirtualizingPanel.ScrollUnit="Pixel">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Toggle Favorite" Click="menuToggleFavorite_Click"/>
+                            <MenuItem Header="Remove" Click="menuRemove_Click"/>
+                            <Separator/>
+                            <MenuItem Header="Format JSON" Click="menuJsonFormat_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
+            </DockPanel>
+            
+            <!-- Right panel - Content editor -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource HeightDividerConverter}, ConverterParameter=2.5}"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Original content -->
+                <GroupBox Grid.Row="0" Header="Original Content">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="200" MaxHeight="250">
+                        <Grid>
+                            <TextBox x:Name="txtOriginal" AcceptsReturn="True" TextWrapping="Wrap" 
+                                     VerticalScrollBarVisibility="Disabled" 
+                                     HorizontalScrollBarVisibility="Disabled"
+                                     BorderThickness="0"/>
+                            <Image x:Name="imgOriginal" Stretch="Uniform" Visibility="Collapsed"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   MaxHeight="280" MaxWidth="500"/>
+                        </Grid>
+                    </ScrollViewer>
+                </GroupBox>
+                
+                <!-- Processing options -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                    <ComboBox x:Name="cmbProcessingType" Width="150" Margin="5" Style="{StaticResource ClassicComboBoxStyle}">
+
+
+                        <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🔑" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Generate Password"/>
+                            </StackPanel>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📧" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Expand Template"/>
+                            </StackPanel>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📊" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                                <TextBlock Text="Convert Table"/>
+                            </StackPanel>
+                        </ComboBoxItem>
+                    </ComboBox>
+                    
+                    <ComboBox x:Name="cmbLanguage" Width="100" Margin="5" Visibility="Collapsed" Style="{StaticResource ClassicComboBoxStyle}">
+                        <ComboBoxItem Content="English" Tag="en" IsSelected="True"/>
+                        <ComboBoxItem Content="French" Tag="fr"/>
+                        <ComboBoxItem Content="German" Tag="de"/>
+                        <ComboBoxItem Content="Spanish" Tag="es"/>
+                        <ComboBoxItem Content="Chinese" Tag="zh"/>
+                        <ComboBoxItem Content="Japanese" Tag="ja"/>
+                    </ComboBox>
+                    
+                    <ComboBox x:Name="cmbCodeLanguage" Width="100" Margin="5" Visibility="Collapsed" Style="{StaticResource ClassicComboBoxStyle}">
+                        <ComboBoxItem Content="JSON" Tag="json" IsSelected="True"/>
+                    </ComboBox>
+                    
+                    <ComboBox x:Name="cmbTone" Width="100" Margin="5" Visibility="Collapsed" Style="{StaticResource ClassicComboBoxStyle}">
+                        <ComboBoxItem Content="Formal" Tag="formal" IsSelected="True"/>
+                        <ComboBoxItem Content="Casual" Tag="casual"/>
+                        <ComboBoxItem Content="Professional" Tag="professional"/>
+                        <ComboBoxItem Content="Academic" Tag="academic"/>
+                        <ComboBoxItem Content="Creative" Tag="creative"/>
+                    </ComboBox>
+                    
+                    <ComboBox x:Name="cmbTableFormat" Width="100" Margin="5" Visibility="Collapsed" Style="{StaticResource ClassicComboBoxStyle}">
+                        <ComboBoxItem Content="HTML" Tag="html" IsSelected="True"/>
+                        <ComboBoxItem Content="Markdown" Tag="markdown"/>
+                        <ComboBoxItem Content="Excel" Tag="excel"/>
+                    </ComboBox>
+                    
+                    <Button x:Name="btnApplyProcessing" Style="{StaticResource ClassicButtonStyle}" Click="btnApplyProcessing_Click" Margin="5" Width="100">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="✨" FontFamily="Segoe UI Emoji" FontSize="14" Margin="0,0,5,0"/>
+                            <TextBlock Text="Apply"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                
+                <!-- Processed content -->
+                <GroupBox Grid.Row="2" Header="Processed Content">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="350">
+                        <TextBox x:Name="txtProcessed" AcceptsReturn="True" TextWrapping="Wrap" 
+                                 VerticalScrollBarVisibility="Disabled"
+                                 HorizontalScrollBarVisibility="Disabled"
+                                 BorderThickness="0"/>
+                    </ScrollViewer>
+                </GroupBox>
+            </Grid>
+        </Grid>
+        
+        <!-- Status bar -->
+        <StatusBar Grid.Row="2" Height="35" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,1,0,0">
+            <StatusBarItem>
+                <TextBlock x:Name="txtStatus" Text="Ready" FontWeight="Normal" />
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="txtHistoryCount" Margin="0,0,10,0" FontWeight="Normal"/>
+                    <TextBlock x:Name="txtClipboardSource" Margin="0,0,10,0" FontWeight="Normal"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

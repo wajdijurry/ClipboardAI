@@ -1,0 +1,85 @@
+{
+  "StartWithWindows": false,
+  "MinimizeToTray": false,
+  "DefaultLanguage": "en",
+  "EnabledPlugins": {
+    "OCR": true,
+    "Summarization": false,
+    "Paraphrasing": false,
+    "CodeFormatting": false,
+    "PasswordGeneration": true,
+    "EmailTemplateExpansion": true,
+    "TableConversion": true,
+    "JsonFormatter": true
+  },
+  "PluginSettings": {
+    "JsonFormatter": {
+      "IndentSize": 4,
+      "WriteIndented": true,
+      "AllowTrailingCommas": false
+    },
+    "Summarization": {
+      "SummaryLength": 200,
+      "PreserveKeyPoints": true
+    },
+    "Paraphrasing": {
+      "Style": "Standard",
+      "CreativityLevel": 50,
+      "PreserveKeyTerms": true,
+      "MaintainTone": true
+    },
+    "OCR": {
+      "PreferredLanguage": "ara",
+      "PreferredEngine": "tesseract"
+    },
+    "EmailTemplateExpansion": {
+      "Templates": {
+        "thank_you": "Dear [Recipient],\n\nThank you for your email. I appreciate your [Reason].\n\n[Signature]",
+        "meeting_request": "Dear [Recipient],\n\nI would like to schedule a meeting to discuss [Topic]. Are you available on [Date] at [Time]?\n\n[Signature]",
+        "follow_up": "Dear [Recipient],\n\nI'm following up on our conversation about [Topic]. [Message]\n\n[Signature]"
+      },
+      "IncludeSignature": true,
+      "DefaultSignature": "Best regards,\n[Your Name]",
+      "AutoFillRecipientName": true
+    },
+    "TableConversion": {
+      "DefaultOutputFormat": "Markdown",
+      "PreserveHeaderFormatting": true,
+      "AutoDetectDelimiter": true
+    },
+    "PasswordGeneration": {
+      "DefaultLength": 16,
+      "IncludeSpecialChars": true,
+      "IncludeNumbers": true,
+      "IncludeUppercase": true,
+      "IncludeLowercase": true
+    }
+  },
+  "ModelDirectory": "D:\\desktop-apps\\ClipboardAI\\ClipboardAI.UI\\bin\\Debug\\net6.0-windows\\Models",
+  "ProcessingThreads": 8,
+  "MemoryLimitMB": 1024,
+  "EnableDebugLogging": true,
+  "UseCpuOnly": true,
+  "MaxHistorySize": 100,
+  "ExpirationDays": 30,
+  "EnableFuzzySearch": true,
+  "EnableMultiClipboard": true,
+  "EncryptSensitiveData": false,
+  "AutoClearSensitiveData": false,
+  "UseAppWhitelisting": false,
+  "WhitelistedApps": [],
+  "EnableAuditLogging": false,
+  "EnableSharedClipboard": false,
+  "SharedClipboardAddress": "",
+  "SharedClipboardPort": 0,
+  "SharedClipboardPassword": "",
+  "Theme": "Light",
+  "EnableSoundFeedback": false,
+  "ShowMiniPreview": true,
+  "EnableHotkeys": true,
+  "CustomHotkeys": {
+    "ClipboardMenu": "Ctrl+Alt+V",
+    "FavoritesMenu": "Ctrl+Alt+F",
+    "QuickPaste": "Ctrl+Alt+Q"
+  }
+}
