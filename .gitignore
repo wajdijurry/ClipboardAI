@@ -50,6 +50,25 @@ x64/
 x86/
 build/
 bld/
+
+# Scripts and deployment files
+*.bat
+*.cmd
+*.ps1
+*.sh
+
+# Log files
+*.log
+*.binlog
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*~
+
 [Bb]in/
 [Oo]bj/
 [Oo]ut/
