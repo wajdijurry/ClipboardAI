@@ -867,8 +867,21 @@ namespace ClipboardAI.UI
 
         private void btnSettings_Click(object sender, RoutedEventArgs e)
         {
+            // Temporarily disable hotkeys before opening settings window
+            bool hotkeysWereEnabled = _settings.EnableHotkeys;
+            if (hotkeysWereEnabled)
+            {
+                _hotkeyManager.UnregisterAllHotkeys();
+            }
+            
             SettingsWindow settingsWindow = new SettingsWindow();
             bool? result = settingsWindow.ShowDialog();
+            
+            // Re-enable hotkeys if they were enabled before
+            if (hotkeysWereEnabled && _settings.EnableHotkeys)
+            {
+                RegisterHotkeys();
+            }
             
             if (result == true)
             {
@@ -1774,6 +1787,37 @@ namespace ClipboardAI.UI
         public PluginManager GetPluginManager()
         {
             return PluginManager.Instance;
+        }
+        
+        /// <summary>
+        /// Disables all hotkeys temporarily
+        /// </summary>
+        public void DisableHotkeys()
+        {
+            if (_hotkeyManager != null)
+            {
+                _hotkeyManager.UnregisterAllHotkeys();
+            }
+        }
+        
+        /// <summary>
+        /// Re-enables hotkeys if they were enabled in settings
+        /// </summary>
+        public void EnableHotkeys()
+        {
+            if (_hotkeyManager != null && _settings.EnableHotkeys)
+            {
+                RegisterHotkeys();
+            }
+        }
+        
+        /// <summary>
+        /// Checks if hotkeys are currently enabled in settings
+        /// </summary>
+        /// <returns>True if hotkeys are enabled in settings</returns>
+        public bool AreHotkeysEnabled()
+        {
+            return _settings.EnableHotkeys;
         }
         
         /// <summary>

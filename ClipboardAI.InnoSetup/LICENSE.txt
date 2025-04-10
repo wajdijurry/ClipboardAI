@@ -1,0 +1,52 @@
+END-USER LICENSE AGREEMENT FOR CLIPBOARDAI SOFTWARE
+Developed and Owned by Wajdi Jurry
+
+IMPORTANT: PLEASE READ THIS LICENSE CAREFULLY BEFORE USING THIS SOFTWARE.
+
+1. LICENSE GRANT
+ClipboardAI Software grants you a non-exclusive license to use the ClipboardAI software ("Software") on your devices in accordance with the terms of this EULA.
+
+2. OPEN SOURCE COMPONENTS
+The installer source code for this Software is open source and available under the MIT License. You are free to modify, distribute, and use the installer source code in accordance with the MIT License terms.
+
+3. APPLICATION LICENSE
+While the installer is open source, the core application components are licensed as follows:
+(a) You may use the Software for personal or commercial use
+(b) You may not reverse engineer, decompile, or disassemble the core application components except as permitted by applicable law
+(c) You may not redistribute the core application components without permission
+
+4. OWNERSHIP
+The core application components are owned and copyrighted by Wajdi Jurry (operating as ClipboardAI Software). The open source components are subject to their respective licenses.
+
+5. TERMINATION
+This license is effective until terminated. Your rights under this license will terminate automatically without notice if you fail to comply with any term of this license.
+
+6. DISCLAIMER OF WARRANTIES
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLIPBOARDAI SOFTWARE DISCLAIMS ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+7. LIMITATION OF LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL CLIPBOARDAI SOFTWARE BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE.
+
+8. PRIVACY AND CLIPBOARD ACCESS
+The Software requires and maintains access to your system clipboard to provide its core functionality. By using this Software, you acknowledge and consent to this access.
+
+The Software may also collect and transmit data about your usage for the purpose of improving the Software. This data is collected anonymously and in accordance with our Privacy Policy.
+
+9. GOVERNING LAW
+This license will be governed by and construed in accordance with the laws of the jurisdiction in which ClipboardAI Software is located, without regard to its conflict of law principles.
+
+10. ENTIRE AGREEMENT
+This license constitutes the entire agreement between you and ClipboardAI Software relating to the Software and supersedes all prior or contemporaneous understandings regarding such subject matter.
+
+By installing, copying, or otherwise using the Software, you agree to be bound by the terms of this license. If you do not agree to the terms of this license, do not install or use the Software.
+
+The MIT License (for installer source code):
+Copyright © 2025 Wajdi Jurry (ClipboardAI Software)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the installer source code, to deal in the code without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the code, and to permit persons to whom the code is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the code.
+
+THE CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
+
+Copyright © 2025 Wajdi Jurry (ClipboardAI Software)

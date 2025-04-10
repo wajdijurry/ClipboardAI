@@ -3,9 +3,9 @@
 #define MyAppPublisher "ClipboardAI Software"
 #define MyAppPublisherEmail "support@clipboardai.com"
 #define MyAppURL "https://clipboardai.com/"
-#define MyAppCopyright "Copyright © 2025 ClipboardAI Software | Developed by: Wajdi Jurry"
+#define MyAppCopyright "Copyright © 2025 ClipboardAI Software"
 #define MyAppExeName "ClipboardAI.UI.exe"
-#define DotNetURL "https://drive.usercontent.google.com/download?id=1nZsQT2WIvzP_pKvnUMp_m1mAc5KYWbUn&export=download&confirm=t&uuid=85349c64-e19d-43fa-95a7-f31920837270"
+#define DotNetURL "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe"
 #define DotNetName "windowsdesktop-runtime-6.0.25-win-x64.exe"
 #define OutputName "ClipboardAI_Setup"
 
@@ -35,6 +35,7 @@ AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
+LicenseFile=LICENSE.txt
 AppUpdatesURL={#MyAppURL}
 AppContact={#MyAppPublisherEmail}
 AppCopyright={#MyAppCopyright}
@@ -169,7 +170,8 @@ Name: "compact"; Description: "Compact installation"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Messages]
-BeveledLabel=Developed by: Wajdi Jurry
+; Remove the text from the bevel line
+BeveledLabel=
 
 [Run]
 Filename: "{tmp}\{#DotNetName}"; Parameters: "/install /passive /norestart"; StatusMsg: "Installing .NET 6.0 Desktop Runtime..."; Check: DotNetInstallApproved; Flags: waituntilterminated
@@ -402,6 +404,8 @@ begin
 end;
 
 procedure InitializeWizard;
+var
+  DeveloperLabel: TNewStaticText;
 begin
   // Check if .NET 6.0 Desktop Runtime is needed
   NeedDotNet := DotNetNeeded();
@@ -412,6 +416,18 @@ begin
   
   // Initialize plugin IDs
   InitializePluginIds();
+  
+  // Add custom developer label below the bevel line
+  DeveloperLabel := TNewStaticText.Create(WizardForm);
+  DeveloperLabel.Parent := WizardForm;
+  DeveloperLabel.Caption := 'Developed by: Wajdi Jurry';
+  DeveloperLabel.Font.Style := [fsBold];
+  DeveloperLabel.Font.Size := 8;
+  DeveloperLabel.Font.Color := $AFAFAF; // Light gray color
+  
+  // Position it below the bevel line
+  DeveloperLabel.Top := WizardForm.Bevel.Top + WizardForm.Bevel.Height + 107;
+  DeveloperLabel.Left := 15;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;

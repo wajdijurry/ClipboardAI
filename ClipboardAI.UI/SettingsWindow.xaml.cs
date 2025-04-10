@@ -18,12 +18,28 @@ namespace ClipboardAI.UI
     {
         private AppSettings _settings;
 
+        private MainWindow _mainWindow;
+        private bool _hotkeysPreviouslyEnabled;
+        
         public SettingsWindow()
         {
             InitializeComponent();
             
+            // Get reference to main window
+            _mainWindow = Application.Current.MainWindow as MainWindow;
+            
+            // Temporarily disable hotkeys while settings window is open
+            if (_mainWindow != null)
+            {
+                _hotkeysPreviouslyEnabled = _mainWindow.AreHotkeysEnabled();
+                _mainWindow.DisableHotkeys();
+            }
+            
             LoadSettings();
             CreatePluginTabs();
+            
+            // Re-enable hotkeys when window is closed
+            this.Closed += SettingsWindow_Closed;
         }
 
         private void LoadSettings()
@@ -680,6 +696,15 @@ namespace ClipboardAI.UI
                 this.DialogResult = false;
             }
             this.Close();
+        }
+
+        private void SettingsWindow_Closed(object sender, EventArgs e)
+        {
+            // Re-enable hotkeys if they were previously enabled
+            if (_mainWindow != null && _hotkeysPreviouslyEnabled)
+            {
+                _mainWindow.EnableHotkeys();
+            }
         }
     }
 }
