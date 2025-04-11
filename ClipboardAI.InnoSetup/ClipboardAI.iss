@@ -177,6 +177,18 @@ BeveledLabel=
 Filename: "{tmp}\{#DotNetName}"; Parameters: "/install /passive /norestart"; StatusMsg: "Installing .NET 6.0 Desktop Runtime..."; Check: DotNetInstallApproved; Flags: waituntilterminated
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[UninstallDelete]
+; Delete any remaining files and folders
+Type: filesandordirs; Name: "{app}\*"
+Type: dirifempty; Name: "{app}"
+; Delete user settings
+Type: filesandordirs; Name: "{localappdata}\ClipboardAI\*"
+Type: dirifempty; Name: "{localappdata}\ClipboardAI"
+
+[InstallDelete]
+; Clean up any leftover files from previous installations
+Type: filesandordirs; Name: "{app}\*"
+
 [Code]
 var
   DownloadPage: TDownloadWizardPage;
@@ -202,6 +214,13 @@ var
   
   // Plugin IDs for settings
   PluginIds: array of String;
+
+procedure KillProcess(ExeFileName: string);
+var
+  ResultCode: Integer;
+begin
+  Exec('taskkill.exe', '/f /im "' + ExeFileName + '"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
 
 // Check if .NET 6.0 Desktop Runtime is needed
 function DotNetNeeded(): Boolean;
@@ -401,6 +420,12 @@ begin
   finally
     SettingsFile.Free;
   end;
+end;
+
+procedure InitializeUninstallProgressForm();
+begin
+  // Terminate any running instances of the application before uninstalling
+  KillProcess('{#MyAppExeName}');
 end;
 
 procedure InitializeWizard;
@@ -609,6 +634,15 @@ begin
               begin
                 CopyFile(ExpandConstant('{tmp}\multilingual-e5-small.onnx'), ExpandConstant('{app}\Plugins\LanguageDetection\Models\multilingual-e5-small.onnx'), False);
                 Log('Copied E5 model to Language Detection');
+              end;
+              
+              // Copy to Keyword Extraction Models directory if selected
+              if WizardIsComponentSelected('plugins\keywordextraction') then
+              begin
+                // Create the directory if it doesn't exist
+                ForceDirectories(ExpandConstant('{app}\Plugins\KeywordExtraction\Models'));
+                CopyFile(ExpandConstant('{tmp}\multilingual-e5-small.onnx'), ExpandConstant('{app}\Plugins\KeywordExtraction\Models\multilingual-e5-small.onnx'), False);
+                Log('Copied E5 model to Keyword Extraction');
               end;
             end;
             

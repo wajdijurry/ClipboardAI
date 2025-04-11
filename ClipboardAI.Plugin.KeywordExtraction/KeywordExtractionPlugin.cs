@@ -124,8 +124,8 @@ namespace ClipboardAI.Plugin.KeywordExtraction
         {
             try
             {
-                // Initialize the model service
-                bool success = await MultilingualModelService.Instance.InitializeAsync("multilingual-e5-small", _progressReporter);
+                // Initialize the model service with the plugin's feature ID
+                bool success = await MultilingualModelService.Instance.InitializeAsync("multilingual-e5-small", _progressReporter, FeatureId);
                 
                 if (success)
                 {

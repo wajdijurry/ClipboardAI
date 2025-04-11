@@ -45,8 +45,9 @@ namespace ClipboardAI.Common
         /// </summary>
         /// <param name="modelName">Name of the model to initialize</param>
         /// <param name="progressCallback">Optional callback to report initialization progress</param>
+        /// <param name="featureId">Optional feature ID of the plugin requesting initialization</param>
         /// <returns>True if initialization was successful</returns>
-        public async Task<bool> InitializeAsync(string modelName = "multilingual-e5-small", IProgress<int> progressCallback = null)
+        public async Task<bool> InitializeAsync(string modelName = "multilingual-e5-small", IProgress<int>? progressCallback = null, string featureId = null)
         {
             if (_isInitialized)
                 return true;
@@ -64,25 +65,35 @@ namespace ClipboardAI.Common
                 // Determine model path using plugin-specific directories
                 string pluginsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
                 
-                // Try to find the appropriate plugin directory based on the calling assembly
-                string callingAssembly = System.Reflection.Assembly.GetCallingAssembly().GetName().Name;
+                // Determine the plugin directory based on the feature ID
                 string pluginDir;
                 
-                if (callingAssembly.Contains("GrammarChecker"))
+                if (string.IsNullOrEmpty(featureId))
+                {
+                    // No feature ID provided, use Common directory
+                    pluginDir = Path.Combine(pluginsDir, "Common");
+                    Console.WriteLine("No feature ID provided, using Common directory");
+                }
+                else if (featureId == "KeywordExtraction")
+                {
+                    pluginDir = Path.Combine(pluginsDir, "KeywordExtraction");
+                    Console.WriteLine("Loading model for Keyword Extraction plugin");
+                }
+                else if (featureId == "GrammarChecker")
                 {
                     pluginDir = Path.Combine(pluginsDir, "GrammarChecker");
                     Console.WriteLine("Loading model for Grammar Checker plugin");
                 }
-                else if (callingAssembly.Contains("LanguageDetection"))
+                else if (featureId == "LanguageDetection")
                 {
                     pluginDir = Path.Combine(pluginsDir, "LanguageDetection");
                     Console.WriteLine("Loading model for Language Detection plugin");
                 }
                 else
                 {
-                    // Fallback to common directory if the calling assembly is not recognized
+                    // Fallback to common directory if the feature ID is not recognized
                     pluginDir = Path.Combine(pluginsDir, "Common");
-                    Console.WriteLine("Loading model for unknown plugin, using Common directory");
+                    Console.WriteLine($"Loading model for unknown feature ID '{featureId}', using Common directory");
                 }
                 
                 // Set model path in the plugin-specific Models directory
